@@ -1,0 +1,9 @@
+.vscode/
+docs/
+
+# totally legally acquired ROMs
+roms/
+
+.DS_Store
+*.o
+gbem
