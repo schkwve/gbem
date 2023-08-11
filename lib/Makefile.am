@@ -5,6 +5,7 @@ libgbem_la_SOURCES = emu.c \
 				instr.c \
 				cartridge.c \
 				cpu.c \
+				ram.c \
 				cpu_proc.c \
 				cpu_util.c \
 				ppu.c \

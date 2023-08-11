@@ -224,6 +224,16 @@ void cpu_fetch_data()
 	}
 }
 
+uint8_t cpu_get_ie()
+{
+	return ctx.ie_reg;
+}
+
+void cpu_set_ie(uint8_t n)
+{
+	ctx.ie_reg = n;
+}
+
 void cpu_exec()
 {
 	IN_PROC proc = inst_get_proc(ctx.instr->type);

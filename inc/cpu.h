@@ -51,6 +51,7 @@ typedef struct {
 	bool step_mode;
 
 	bool int_master_enabled;
+	uint8_t ie_reg;
 } cpu_ctx;
 
 typedef void (*IN_PROC)(cpu_ctx *);
@@ -66,6 +67,9 @@ void cpu_fetch_instruction();
 void cpu_fetch_data();
 void cpu_exec();
 
+uint8_t cpu_get_ie();
+void cpu_set_ie(uint8_t n);
+
 //// UTILS
 
 uint16_t reverse(uint16_t n);
@@ -78,6 +82,7 @@ void cpu_set_flags(cpu_ctx *ctx, char z, char n, char h, char c);
 void proc_none(cpu_ctx *ctx);
 void proc_nop(cpu_ctx *ctx);
 void proc_ld(cpu_ctx *ctx);
+void proc_ldh(cpu_ctx *ctx);
 void proc_jp(cpu_ctx *ctx);
 void proc_di(cpu_ctx *ctx);
 void proc_xor(cpu_ctx *ctx);

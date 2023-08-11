@@ -21,10 +21,17 @@
 #include <bus.h>
 #include <emu.h>
 
+// clang-format off
 static IN_PROC instr_func[] = {
-	[IN_NONE] = proc_none, [IN_NOP] = proc_nop, [IN_LD] = proc_ld,
-	[IN_JP] = proc_jp,	   [IN_DI] = proc_di,	[IN_XOR] = proc_xor
+	[IN_NONE] = proc_none,
+	[IN_NOP] = proc_nop,
+	[IN_LD] = proc_ld,
+	[IN_LDH] = proc_ldh,
+	[IN_JP] = proc_jp,
+	[IN_DI] = proc_di,
+	[IN_XOR] = proc_xor
 };
+// clang-format on
 
 IN_PROC inst_get_proc(in_type type)
 {
@@ -66,6 +73,17 @@ void proc_ld(cpu_ctx *ctx)
 		cpu_set_reg(ctx->instr->reg1,
 					cpu_read_reg(ctx->instr->reg2) + (char)ctx->fetch_data);
 	}
+}
+
+void proc_ldh(cpu_ctx *ctx)
+{
+	if (ctx->instr->reg1 == RT_A) {
+		cpu_set_reg(ctx->instr->reg1, bus_read(ctx->fetch_data | 0xFF00));
+	} else {
+		bus_write(ctx->fetch_data | 0xFF00, ctx->regs.a);
+	}
+
+	emu_cycle(1);
 }
 
 void proc_jp(cpu_ctx *ctx)
