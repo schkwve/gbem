@@ -44,7 +44,7 @@ typedef struct {
 	uint32_t rom_size;
 	uint8_t *rom_data;
 	rom_header *header;
-} cart_context;
+} cart_ctx;
 
 bool cart_load(char *cart);
 

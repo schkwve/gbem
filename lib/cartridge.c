@@ -19,7 +19,7 @@
 
 #include <cartridge.h>
 
-static cart_context ctx;
+static cart_ctx ctx;
 
 static const char *ROM_TYPES[] = {
 	"ROM ONLY",

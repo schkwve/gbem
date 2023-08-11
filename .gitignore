@@ -2,7 +2,8 @@
 build/
 
 # Totally legally acquired ROMs
-roms/
+roms/*
+!roms/.gitkeep
 
 # Compiled Object files
 *.slo
