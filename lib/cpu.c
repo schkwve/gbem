@@ -31,12 +31,19 @@ void cpu_init()
 bool cpu_step()
 {
 	if (!ctx.is_halted) {
+		uint16_t pc = ctx.regs.pc;
+
 		cpu_fetch_instruction();
 		cpu_fetch_data();
-		cpu_exec();
-		return true;
+
+		printf("%02x:%02x\n", ctx.opcode, pc);
+
+		if (ctx.instr == NULL) {
+			cpu_exec();
+		}
 	}
-	return false;
+
+	return true;
 }
 
 void cpu_fetch_instruction()
@@ -53,6 +60,10 @@ void cpu_fetch_data()
 {
 	ctx.dest_is_mem = false;
 	ctx.mem_dest = 0;
+
+	if (ctx.instr == NULL) {
+		return;
+	}
 
 	switch (ctx.instr->mode) {
 		case AM_IMP: {	// nothing needs to be returned
