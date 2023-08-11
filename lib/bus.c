@@ -32,9 +32,25 @@ uint8_t bus_read(uint16_t addr)
 	return 0;
 }
 
+uint16_t bus_read16(uint16_t addr)
+{
+	uint8_t lo = bus_read(addr);
+	uint8_t hi = bus_read(addr + 1);
+	return lo | (hi << 8);
+}
+
 void bus_write(uint16_t addr, uint8_t val)
 {
-	(void)addr;
-	(void)val;
+	if (addr < 0x8000) {
+		cart_write(addr, val);
+		return;
+	}
+
 	NOT_IMPLEMENTED();
+}
+
+void bus_write16(uint16_t addr, uint16_t val)
+{
+	bus_write(addr + 1, (val >> 8) & 0xFF);
+	bus_write(addr, val & 0xFF);
 }

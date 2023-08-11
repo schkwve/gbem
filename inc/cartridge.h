@@ -49,5 +49,6 @@ typedef struct {
 bool cart_load(char *cart);
 
 uint8_t cart_read(uint16_t addr);
+void cart_write(uint16_t addr, uint8_t val);
 
 #endif // __CARTRIDGE_H_

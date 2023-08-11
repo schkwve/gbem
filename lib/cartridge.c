@@ -188,3 +188,10 @@ uint8_t cart_read(uint16_t addr)
 	// ROM ONLY for now
 	return ctx.rom_data[addr];
 }
+
+void cart_write(uint16_t addr, uint8_t val)
+{
+	(void)addr;
+	(void)val;
+	NOT_IMPLEMENTED();
+}

@@ -18,6 +18,7 @@
  */
 
 #include <cpu.h>
+#include <bus.h>
 #include <emu.h>
 
 static IN_PROC instr_func[] = {
@@ -43,8 +44,28 @@ void proc_nop(cpu_ctx *ctx)
 
 void proc_ld(cpu_ctx *ctx)
 {
-	(void)ctx;
-	NOT_IMPLEMENTED();
+	if (ctx->dest_is_mem) {
+		if (ctx->instr->reg2 >= RT_AF) {
+			emu_cycle(1);
+			bus_write16(ctx->mem_dest, ctx->fetch_data);
+		} else {
+			bus_write(ctx->mem_dest, ctx->fetch_data);
+		}
+		return;
+	}
+
+	if (ctx->instr->mode == AM_HL_SPR) {
+		uint8_t hflag =
+			(cpu_read_reg(ctx->instr->reg2) & 0xF) + (ctx->fetch_data & 0xF) >=
+			0x10;
+		uint8_t cflag =
+			(cpu_read_reg(ctx->instr->reg2) & 0xF) + (ctx->fetch_data & 0xFF) >=
+			0x100;
+
+		cpu_set_flags(ctx, 0, 0, hflag, cflag);
+		cpu_set_reg(ctx->instr->reg1,
+					cpu_read_reg(ctx->instr->reg2) + (char)ctx->fetch_data);
+	}
 }
 
 void proc_jp(cpu_ctx *ctx)
