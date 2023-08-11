@@ -1,9 +1,50 @@
 .vscode/
-docs/gen
+build/
 
-# totally legally acquired ROMs
+# Totally legally acquired ROMs
 roms/
 
-.DS_Store
+# Compiled Object files
+*.slo
+*.lo
 *.o
-gbem
+*.obj
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+*.swp
+*.DS_Store
+*.in
+
+autom4te.cache/
+compile
+config.guess
+config.log
+config.status
+config.sub
+configure~
+depcomp
+missing
+ltmain.sh
+libtool
+install-sh
+Makefile
+src/Makefile
+lib/Makefile
+inc/Makefile
+
+.deps

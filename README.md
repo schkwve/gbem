@@ -20,4 +20,4 @@ For anyone interested, below is a list of resources I have found to help me duri
 
 ![GPL3 License](https://www.gnu.org/graphics/gplv3-with-text-136x68.png)
 
-LibM is licensed under the GPLv3 license, which you can find [here](LICENSE).
+LibM is licensed under the GPLv3 license, which you can find [here](COPYING).
