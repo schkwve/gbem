@@ -39,6 +39,13 @@ typedef struct {
 	uint16_t global_checksum;
 } rom_header;
 
+typedef struct {
+	char filename[1024];
+	uint32_t rom_size;
+	uint8_t *rom_data;
+	rom_header *header;
+} cart_context;
+
 bool cart_load(char *cart);
 
 #endif // __CARTRIDGE_H_

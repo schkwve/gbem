@@ -19,13 +19,6 @@
 
 #include <cartridge.h>
 
-typedef struct {
-	char filename[1024];
-	uint32_t rom_size;
-	uint8_t *rom_data;
-	rom_header *header;
-} cart_context;
-
 static cart_context ctx;
 
 static const char *ROM_TYPES[] = {
