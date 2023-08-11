@@ -21,8 +21,41 @@
 #define __CPU_H_
 
 #include <common.h>
+#include <instr.h>
+
+typedef struct {
+	uint8_t a;
+	uint8_t f;
+	uint8_t b;
+	uint8_t c;
+	uint8_t d;
+	uint8_t e;
+	uint8_t h;
+	uint8_t l;
+	uint16_t pc;
+	uint16_t sp;
+} cpu_regs;
+
+typedef struct {
+	cpu_regs regs;
+	uint16_t fetch_data;
+	bool dest_is_mem;
+	uint16_t mem_dest;
+	uint8_t opcode;
+	instruction *instr;
+
+	bool is_halted;
+	bool step_mode;
+} cpu_ctx;
 
 void cpu_init();
 bool cpu_step();
+
+void cpu_fetch_instruction();
+void cpu_fetch_data();
+void cpu_exec();
+
+uint16_t reverse(uint16_t n);
+uint16_t cpu_read_reg(reg_type rt);
 
 #endif // __CPU_H_

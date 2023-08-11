@@ -35,5 +35,6 @@ typedef struct {
 int emu_run(int argc, char **argv);
 
 emu_ctx *emu_get_context();
+void emu_cycle(int num);
 
 #endif // __EMU_H_

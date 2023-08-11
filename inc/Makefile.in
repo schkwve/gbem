@@ -287,7 +287,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-include_HEADERS = emu.h common.h
+include_HEADERS = emu.h \
+				bus.h \
+				cartridge.h \
+				cpu.h \
+				ppu.h \
+				timer.h \
+				common.h
+
 all: all-am
 
 .SUFFIXES:

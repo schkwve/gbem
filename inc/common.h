@@ -29,6 +29,9 @@
 #define BIT_SET(a, n, on) (on ? (a) |= (1 << n) : (a) &= ~(1 << n))
 #define BETWEEN(a, b, c) ((a >= b) && (a <= c))
 
+#define NOT_IMPLEMENTED() \
+	fprintf(stderr, "%s is not implemented yet\n", __func__)
+
 void delay(uint32_t ms);
 
 #endif // __COMMON_H_

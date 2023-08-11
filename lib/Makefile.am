@@ -1,8 +1,11 @@
 lib_LTLIBRARIES = libgbem.la
 
 libgbem_la_SOURCES = emu.c \
+				bus.c \
+				instr.c \
 				cartridge.c \
 				cpu.c \
+				cpu_util.c \
 				ppu.c \
 				timer.c
 

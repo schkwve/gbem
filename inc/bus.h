@@ -22,7 +22,7 @@
 
 #include <common.h>
 
-uint8_t bus_read(uint16_t address);
-void bus_write(uint16_t address, uint8_t value);
+uint8_t bus_read(uint16_t addr);
+void bus_write(uint16_t addr, uint8_t val);
 
 #endif // __BUS_H_

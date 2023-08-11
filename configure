@@ -4411,7 +4411,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-CFLAGS="-O2 -g3 -Wall -Wextra -Werror -pedantic -std=c99"
+CFLAGS="-O2 -g3 -Wall -Wextra -pedantic -std=c99"
 
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for SDL_Init in -lSDL2" >&5

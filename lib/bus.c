@@ -17,66 +17,24 @@
  *
  */
 
-#include <stdio.h>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-
-#include <emu.h>
+#include <common.h>
+#include <bus.h>
 #include <cartridge.h>
-#include <cpu.h>
 
-static emu_ctx ctx;
-
-emu_ctx *emu_get_context()
+uint8_t bus_read(uint16_t addr)
 {
-	return &ctx;
-}
-
-void delay(uint32_t ms)
-{
-	SDL_Delay(ms);
-}
-
-int emu_run(int argc, char **argv)
-{
-	if (argc < 2) {
-		printf("Usage: %s <rom_file>\n", argv[0]);
-		return -1;
+	// ROM Data
+	if (addr < 0x8000) {
+		return cart_read(addr);
 	}
 
-	if (!cart_load(argv[1])) {
-		printf("Failed to load ROM file: %s\n", argv[1]);
-		return -2;
-	}
-
-	SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
-
-	cpu_init();
-
-	ctx.running = true;
-	ctx.paused = false;
-	ctx.ticks = 0;
-
-	while (ctx.running) {
-		if (ctx.paused) {
-			delay(10);
-			continue;
-		}
-
-		if (!cpu_step()) {
-			printf("CPU Stopped\n");
-			return -3;
-		}
-
-		ctx.ticks++;
-	}
-
+	NOT_IMPLEMENTED();
 	return 0;
 }
 
-void emu_cycle(int num)
+void bus_write(uint16_t addr, uint8_t val)
 {
-	(void)num;
+	(void)addr;
+	(void)val;
 	NOT_IMPLEMENTED();
 }

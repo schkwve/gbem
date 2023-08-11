@@ -7,7 +7,7 @@ AC_PROG_MAKE_SET
 AC_PROG_CC
 AC_LANG(C)
 
-CFLAGS="-O2 -g3 -Wall -Wextra -Werror -pedantic -std=c99"
+CFLAGS="-O2 -g3 -Wall -Wextra -pedantic -std=c99"
 
 AC_CHECK_LIB([SDL2], [SDL_Init], [], [
 			echo "The SDL2 library is required for this program."

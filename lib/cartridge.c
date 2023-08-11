@@ -182,3 +182,9 @@ bool cart_load(char *cart)
 
 	return true;
 }
+
+uint8_t cart_read(uint16_t addr)
+{
+	// ROM ONLY for now
+	return ctx.rom_data[addr];
+}

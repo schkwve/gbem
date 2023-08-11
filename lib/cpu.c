@@ -18,12 +18,74 @@
  */
 
 #include <cpu.h>
+#include <emu.h>
+#include <bus.h>
+
+cpu_ctx ctx = { 0 };
 
 void cpu_init()
 {
+	ctx.regs.pc = 0x100;
 }
 
 bool cpu_step()
 {
+	if (!ctx.is_halted) {
+		cpu_fetch_instruction();
+		cpu_fetch_data();
+		cpu_exec();
+		return true;
+	}
 	return false;
+}
+
+void cpu_fetch_instruction()
+{
+	ctx.opcode = bus_read(ctx.regs.pc++);
+	ctx.instr = inst_get_by_opcode(ctx.opcode);
+	if (ctx.instr == NULL) {
+		fprintf(stderr, "Unknown Instruction: %02x\n", ctx.opcode);
+		exit(-8);
+	}
+}
+
+void cpu_fetch_data()
+{
+	ctx.dest_is_mem = false;
+	ctx.mem_dest = 0;
+
+	switch (ctx.instr->mode) {
+	case AM_IMP: { // nothing needs to be returned
+		return;
+	}
+	case AM_R: { // read data from a register
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg1);
+		return;
+	}
+	case AM_R_D8: { // set an 8-bit value to a register
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+	}
+	case AM_D16: { // set a 16-bit value
+		uint16_t lo = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		uint16_t hi = bus_read(ctx.regs.pc + 1);
+		emu_cycle(1);
+		ctx.fetch_data = lo | (hi << 8);
+		ctx.regs.pc += 2;
+		return;
+	}
+	default: {
+		printf("Unknown addressing mode: %d\n", ctx.instr->mode);
+		exit(1);
+	}
+	}
+}
+
+void cpu_exec()
+{
+	printf("Executing %02x on PC %04x\n", ctx.opcode, ctx.regs.pc);
+	// NOT_IMPLEMENTED();
 }

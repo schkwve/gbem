@@ -130,8 +130,9 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libgbem_la_DEPENDENCIES =
-am_libgbem_la_OBJECTS = libgbem_la-emu.lo libgbem_la-cartridge.lo \
-	libgbem_la-cpu.lo libgbem_la-ppu.lo libgbem_la-timer.lo
+am_libgbem_la_OBJECTS = libgbem_la-emu.lo libgbem_la-bus.lo \
+	libgbem_la-instr.lo libgbem_la-cartridge.lo libgbem_la-cpu.lo \
+	libgbem_la-cpu_util.lo libgbem_la-ppu.lo libgbem_la-timer.lo
 libgbem_la_OBJECTS = $(am_libgbem_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -152,8 +153,12 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libgbem_la-cartridge.Plo \
-	./$(DEPDIR)/libgbem_la-cpu.Plo ./$(DEPDIR)/libgbem_la-emu.Plo \
+am__depfiles_remade = ./$(DEPDIR)/libgbem_la-bus.Plo \
+	./$(DEPDIR)/libgbem_la-cartridge.Plo \
+	./$(DEPDIR)/libgbem_la-cpu.Plo \
+	./$(DEPDIR)/libgbem_la-cpu_util.Plo \
+	./$(DEPDIR)/libgbem_la-emu.Plo \
+	./$(DEPDIR)/libgbem_la-instr.Plo \
 	./$(DEPDIR)/libgbem_la-ppu.Plo \
 	./$(DEPDIR)/libgbem_la-timer.Plo
 am__mv = mv -f
@@ -323,8 +328,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libgbem.la
 libgbem_la_SOURCES = emu.c \
+				bus.c \
+				instr.c \
 				cartridge.c \
 				cpu.c \
+				cpu_util.c \
 				ppu.c \
 				timer.c
 
@@ -409,9 +417,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-bus.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-cartridge.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-cpu.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-cpu_util.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-emu.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-instr.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-ppu.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-timer.Plo@am__quote@ # am--include-marker
 
@@ -452,6 +463,20 @@ libgbem_la-emu.lo: emu.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-emu.lo `test -f 'emu.c' || echo '$(srcdir)/'`emu.c
 
+libgbem_la-bus.lo: bus.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-bus.lo -MD -MP -MF $(DEPDIR)/libgbem_la-bus.Tpo -c -o libgbem_la-bus.lo `test -f 'bus.c' || echo '$(srcdir)/'`bus.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgbem_la-bus.Tpo $(DEPDIR)/libgbem_la-bus.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='bus.c' object='libgbem_la-bus.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-bus.lo `test -f 'bus.c' || echo '$(srcdir)/'`bus.c
+
+libgbem_la-instr.lo: instr.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-instr.lo -MD -MP -MF $(DEPDIR)/libgbem_la-instr.Tpo -c -o libgbem_la-instr.lo `test -f 'instr.c' || echo '$(srcdir)/'`instr.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgbem_la-instr.Tpo $(DEPDIR)/libgbem_la-instr.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='instr.c' object='libgbem_la-instr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-instr.lo `test -f 'instr.c' || echo '$(srcdir)/'`instr.c
+
 libgbem_la-cartridge.lo: cartridge.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-cartridge.lo -MD -MP -MF $(DEPDIR)/libgbem_la-cartridge.Tpo -c -o libgbem_la-cartridge.lo `test -f 'cartridge.c' || echo '$(srcdir)/'`cartridge.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgbem_la-cartridge.Tpo $(DEPDIR)/libgbem_la-cartridge.Plo
@@ -465,6 +490,13 @@ libgbem_la-cpu.lo: cpu.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cpu.c' object='libgbem_la-cpu.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-cpu.lo `test -f 'cpu.c' || echo '$(srcdir)/'`cpu.c
+
+libgbem_la-cpu_util.lo: cpu_util.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-cpu_util.lo -MD -MP -MF $(DEPDIR)/libgbem_la-cpu_util.Tpo -c -o libgbem_la-cpu_util.lo `test -f 'cpu_util.c' || echo '$(srcdir)/'`cpu_util.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgbem_la-cpu_util.Tpo $(DEPDIR)/libgbem_la-cpu_util.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='cpu_util.c' object='libgbem_la-cpu_util.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-cpu_util.lo `test -f 'cpu_util.c' || echo '$(srcdir)/'`cpu_util.c
 
 libgbem_la-ppu.lo: ppu.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-ppu.lo -MD -MP -MF $(DEPDIR)/libgbem_la-ppu.Tpo -c -o libgbem_la-ppu.lo `test -f 'ppu.c' || echo '$(srcdir)/'`ppu.c
@@ -613,9 +645,12 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libgbem_la-cartridge.Plo
+		-rm -f ./$(DEPDIR)/libgbem_la-bus.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-cartridge.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-cpu.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-cpu_util.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-emu.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-instr.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ppu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-timer.Plo
 	-rm -f Makefile
@@ -663,9 +698,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libgbem_la-cartridge.Plo
+		-rm -f ./$(DEPDIR)/libgbem_la-bus.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-cartridge.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-cpu.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-cpu_util.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-emu.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-instr.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ppu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-timer.Plo
 	-rm -f Makefile
