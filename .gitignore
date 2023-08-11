@@ -28,7 +28,6 @@ roms/
 
 *.swp
 *.DS_Store
-*.in
 
 autom4te.cache/
 configure~
