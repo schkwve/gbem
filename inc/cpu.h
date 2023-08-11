@@ -73,18 +73,45 @@ void cpu_set_ie(uint8_t n);
 //// UTILS
 
 uint16_t reverse(uint16_t n);
+reg_type decode_reg(uint8_t reg);
+
 uint16_t cpu_read_reg(reg_type rt);
+cpu_regs *cpu_get_regs();
+
 void cpu_set_reg(reg_type rt, uint16_t val);
+
+uint8_t cpu_read_reg8(reg_type rt);
+void cpu_set_reg8(reg_type rt, uint8_t val);
+
 void cpu_set_flags(cpu_ctx *ctx, char z, char n, char h, char c);
+
+void goto_addr(cpu_ctx *ctx, uint16_t addr, bool pushpc);
 
 //// INSTRUCTIONS
 
 void proc_none(cpu_ctx *ctx);
 void proc_nop(cpu_ctx *ctx);
+void proc_and(cpu_ctx *ctx);
+void proc_xor(cpu_ctx *ctx);
+void proc_or(cpu_ctx *ctx);
+void proc_cp(cpu_ctx *ctx);
+void proc_cb(cpu_ctx *ctx);
+void proc_inc(cpu_ctx *ctx);
+void proc_dec(cpu_ctx *ctx);
+void proc_add(cpu_ctx *ctx);
+void proc_sub(cpu_ctx *ctx);
+void proc_sbc(cpu_ctx *ctx);
+void proc_adc(cpu_ctx *ctx);
 void proc_ld(cpu_ctx *ctx);
 void proc_ldh(cpu_ctx *ctx);
 void proc_jp(cpu_ctx *ctx);
+void proc_jr(cpu_ctx *ctx);
+void proc_call(cpu_ctx *ctx);
+void proc_ret(cpu_ctx *ctx);
+void proc_reti(cpu_ctx *ctx);
+void proc_rst(cpu_ctx *ctx);
 void proc_di(cpu_ctx *ctx);
-void proc_xor(cpu_ctx *ctx);
+void proc_push(cpu_ctx *ctx);
+void proc_pop(cpu_ctx *ctx);
 
 #endif // __CPU_H_
