@@ -21,10 +21,8 @@
 #include <emu.h>
 
 static IN_PROC instr_func[] = {
-	[IN_NONE] = proc_none,
-	[IN_NOP] = proc_nop,
-	[IN_LD] = proc_ld,
-	[IN_JP] = proc_jp
+	[IN_NONE] = proc_none, [IN_NOP] = proc_nop, [IN_LD] = proc_ld,
+	[IN_JP] = proc_jp,	   [IN_DI] = proc_di,	[IN_XOR] = proc_xor
 };
 
 IN_PROC inst_get_proc(in_type type)
@@ -55,5 +53,15 @@ void proc_jp(cpu_ctx *ctx)
 		ctx->regs.pc = ctx->fetch_data;
 		emu_cycle(1);
 	}
-	NOT_IMPLEMENTED();
+}
+
+void proc_di(cpu_ctx *ctx)
+{
+	ctx->int_master_enabled = false;
+}
+
+void proc_xor(cpu_ctx *ctx)
+{
+	ctx->regs.a ^= ctx->fetch_data & 0xFF;
+	cpu_set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
 }

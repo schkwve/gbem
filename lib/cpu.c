@@ -21,10 +21,11 @@
 #include <emu.h>
 #include <bus.h>
 
-cpu_ctx ctx = {0};
+cpu_ctx ctx = { 0 };
 
 void cpu_init()
 {
+	ctx.regs.a = 0x01;
 	ctx.regs.pc = 0x100;
 }
 
@@ -36,7 +37,8 @@ bool cpu_step()
 		cpu_fetch_instruction();
 		cpu_fetch_data();
 
-		printf("%02x:%02x\n", ctx.opcode, pc);
+		printf("%04x:%02x (%02x %02x %02x)\n", pc, ctx.instr->type, ctx.opcode,
+			   bus_read(pc + 1), bus_read(pc + 2));
 
 		if (ctx.instr == NULL) {
 			exit(-1);
@@ -67,32 +69,162 @@ void cpu_fetch_data()
 	}
 
 	switch (ctx.instr->mode) {
-		case AM_IMP: {	// nothing needs to be returned
-			return;
+	case AM_IMP:
+		return;
+
+	case AM_R:
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg1);
+		return;
+
+	case AM_R_R:
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg2);
+		return;
+
+	case AM_R_D8:
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+
+	case AM_R_D16:
+	case AM_D16: {
+		uint16_t lo = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+
+		uint16_t hi = bus_read(ctx.regs.pc + 1);
+		emu_cycle(1);
+
+		ctx.fetch_data = lo | (hi << 8);
+
+		ctx.regs.pc += 2;
+
+		return;
+	}
+
+	case AM_MR_R:
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg2);
+		ctx.mem_dest = cpu_read_reg(ctx.instr->reg1);
+		ctx.dest_is_mem = true;
+
+		if (ctx.instr->reg1 == RT_C) {
+			ctx.mem_dest |= 0xFF00;
 		}
-		case AM_R: {	// read data from a register
-			ctx.fetch_data = cpu_read_reg(ctx.instr->reg1);
-			return;
+
+		return;
+
+	case AM_R_MR: {
+		uint16_t addr = cpu_read_reg(ctx.instr->reg2);
+
+		if (ctx.instr->reg2 == RT_C) {
+			addr |= 0xFF00;
 		}
-		case AM_R_D8: {	// set an 8-bit value to a register
-			ctx.fetch_data = bus_read(ctx.regs.pc);
-			emu_cycle(1);
-			ctx.regs.pc++;
-			return;
-		}
-		case AM_D16: {	// set a 16-bit value
-			uint16_t lo = bus_read(ctx.regs.pc);
-			emu_cycle(1);
-			uint16_t hi = bus_read(ctx.regs.pc + 1);
-			emu_cycle(1);
-			ctx.fetch_data = lo | (hi << 8);
-			ctx.regs.pc += 2;
-			return;
-		}
-		default: {
-			printf("Unknown addressing mode: %d\n", ctx.instr->mode);
-			exit(1);
-		}
+
+		ctx.fetch_data = bus_read(addr);
+		emu_cycle(1);
+	}
+		return;
+
+	case AM_R_HLI:
+		ctx.fetch_data = bus_read(cpu_read_reg(ctx.instr->reg2));
+		emu_cycle(1);
+		cpu_set_reg(RT_HL, cpu_read_reg(RT_HL) + 1);
+		return;
+
+	case AM_R_HLD:
+		ctx.fetch_data = bus_read(cpu_read_reg(ctx.instr->reg2));
+		emu_cycle(1);
+		cpu_set_reg(RT_HL, cpu_read_reg(RT_HL) - 1);
+		return;
+
+	case AM_HLI_R:
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg2);
+		ctx.mem_dest = cpu_read_reg(ctx.instr->reg1);
+		ctx.dest_is_mem = true;
+		cpu_set_reg(RT_HL, cpu_read_reg(RT_HL) + 1);
+		return;
+
+	case AM_HLD_R:
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg2);
+		ctx.mem_dest = cpu_read_reg(ctx.instr->reg1);
+		ctx.dest_is_mem = true;
+		cpu_set_reg(RT_HL, cpu_read_reg(RT_HL) - 1);
+		return;
+
+	case AM_R_A8:
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+
+	case AM_A8_R:
+		ctx.mem_dest = bus_read(ctx.regs.pc) | 0xFF00;
+		ctx.dest_is_mem = true;
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+
+	case AM_HL_SPR:
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+
+	case AM_D8:
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		return;
+
+	case AM_A16_R:
+	case AM_D16_R: {
+		uint16_t lo = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+
+		uint16_t hi = bus_read(ctx.regs.pc + 1);
+		emu_cycle(1);
+
+		ctx.mem_dest = lo | (hi << 8);
+		ctx.dest_is_mem = true;
+
+		ctx.regs.pc += 2;
+		ctx.fetch_data = cpu_read_reg(ctx.instr->reg2);
+	}
+		return;
+
+	case AM_MR_D8: {
+		ctx.fetch_data = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		ctx.regs.pc++;
+		ctx.mem_dest = cpu_read_reg(ctx.instr->reg1);
+		ctx.dest_is_mem = true;
+		return;
+	}
+	case AM_MR: {
+		ctx.mem_dest = cpu_read_reg(ctx.instr->reg1);
+		ctx.dest_is_mem = true;
+		ctx.fetch_data = bus_read(cpu_read_reg(ctx.instr->reg1));
+		emu_cycle(1);
+		return;
+	}
+	case AM_R_A16: {
+		uint16_t lo = bus_read(ctx.regs.pc);
+		emu_cycle(1);
+		uint16_t hi = bus_read(ctx.regs.pc + 1);
+		emu_cycle(1);
+		uint16_t addr = lo | (hi << 8);
+
+		ctx.regs.pc += 2;
+		ctx.fetch_data = bus_read(addr);
+		emu_cycle(1);
+
+		return;
+	}
+
+	default:
+		printf("Unknown Addressing Mode! %d (%02X)\n", ctx.instr->mode,
+			   ctx.opcode);
+		exit(-7);
+		return;
 	}
 }
 
