@@ -39,8 +39,9 @@ bool cpu_step()
 		printf("%02x:%02x\n", ctx.opcode, pc);
 
 		if (ctx.instr == NULL) {
-			cpu_exec();
+			exit(-1);
 		}
+		cpu_exec();
 	}
 
 	return true;
