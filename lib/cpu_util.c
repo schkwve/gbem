@@ -26,6 +26,21 @@ uint16_t reverse(uint16_t n)
 	return ((n & 0xFF00) >> 8) | ((n & 0xFF) << 8);
 }
 
+bool check_cond(cpu_ctx *ctx)
+{
+	bool z = CPU_FLAG_Z;
+	bool c = CPU_FLAG_C;
+
+	switch (ctx->instr->cond) {
+		case CT_NONE: return true;
+		case CT_C: return c;
+		case CT_NC: return !c;
+		case CT_Z: return z;
+		case CT_NZ: return !z;
+		default: return false;
+	}
+}
+
 uint16_t cpu_read_reg(reg_type rt)
 {
 	switch (rt) {

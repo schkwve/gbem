@@ -23,6 +23,9 @@
 #include <common.h>
 #include <instr.h>
 
+#define CPU_FLAG_Z BIT(ctx->regs.f, 7)
+#define CPU_FLAG_C BIT(ctx->regs.f, 4)
+
 typedef struct {
 	uint8_t a;
 	uint8_t f;
@@ -48,8 +51,14 @@ typedef struct {
 	bool step_mode;
 } cpu_ctx;
 
+typedef void (*IN_PROC)(cpu_ctx *);
+
+IN_PROC inst_get_proc(in_type type);
+
 void cpu_init();
 bool cpu_step();
+
+bool check_cond(cpu_ctx *ctx);
 
 void cpu_fetch_instruction();
 void cpu_fetch_data();
@@ -57,5 +66,12 @@ void cpu_exec();
 
 uint16_t reverse(uint16_t n);
 uint16_t cpu_read_reg(reg_type rt);
+
+//// INSTRUCTIONS
+
+void proc_none(cpu_ctx *ctx);
+void proc_nop(cpu_ctx *ctx);
+void proc_ld(cpu_ctx *ctx);
+void proc_jp(cpu_ctx *ctx);
 
 #endif // __CPU_H_
