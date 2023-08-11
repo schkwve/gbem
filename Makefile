@@ -69,4 +69,4 @@ uninstall:
 .PHONY: clean
 clean:
 	@printf " CLEAN\n"
-	@rm -rf $(OBJ) $(PROGRAM) docs/
+	@rm -rf $(OBJ) $(PROGRAM) docs/gen
