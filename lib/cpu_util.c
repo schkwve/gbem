@@ -20,6 +20,7 @@
 #include <cpu.h>
 #include <emu.h>
 #include <bus.h>
+#include <int.h>
 #include <stack.h>
 #include <common.h>
 
@@ -31,7 +32,7 @@ reg_type rt_lookup[] = {
 
 uint16_t reverse(uint16_t n)
 {
-	return ((n & 0xFF00) >> 8) | ((n & 0xFF) << 8);
+	return ((n & 0xFF00) >> 8) | ((n & 0x00FF) << 8);
 }
 
 bool check_cond(cpu_ctx *ctx)
@@ -182,6 +183,7 @@ uint8_t cpu_read_reg8(reg_type rt)
 	case RT_HL:
 		return bus_read(cpu_read_reg(RT_HL));
 	default:
+		printf("Invalid cpu_read_reg8()");
 		return 0;
 	}
 }
@@ -212,6 +214,9 @@ void cpu_set_reg8(reg_type rt, uint8_t val)
 		break;
 	case RT_L:
 		ctx.regs.l = val & 0xFF;
+		break;
+	case RT_HL:
+		bus_write(cpu_read_reg(RT_HL), val);
 		break;
 	default:
 		printf("Invalid reg8: %d\n", rt);
@@ -247,6 +252,16 @@ void goto_addr(cpu_ctx *ctx, uint16_t addr, bool pushpc)
 	}
 }
 
+void cpu_handle_int(cpu_ctx *ctx)
+{
+	if (int_check(ctx, 0x40, IT_VBLANK)) {
+	} else if (int_check(ctx, 0x48, IT_LCD_STAT)) {
+	} else if (int_check(ctx, 0x50, IT_TIMER)) {
+	} else if (int_check(ctx, 0x58, IT_SERIAL)) {
+	} else if (int_check(ctx, 0x60, IT_JOYPAD)) {
+	}
+}
+
 uint8_t cpu_get_int_flags()
 {
 	return ctx.int_flags;
@@ -255,4 +270,9 @@ uint8_t cpu_get_int_flags()
 void cpu_set_int_flags(uint8_t val)
 {
 	ctx.int_flags = val;
+}
+
+bool is_16_bit(reg_type rt)
+{
+	return rt >= RT_AF;
 }

@@ -21,27 +21,35 @@
 #include <emu.h>
 #include <bus.h>
 #include <int.h>
+#include <timer.h>
 
 cpu_ctx ctx = { 0 };
 
 void cpu_init()
 {
-	ctx.regs.a = 0x01;
 	ctx.regs.pc = 0x100;
+	ctx.regs.sp = 0xFFFE;
+	*((short *)&ctx.regs.a) = 0xB001;
+	*((short *)&ctx.regs.b) = 0x1300;
+	*((short *)&ctx.regs.d) = 0xD800;
+	*((short *)&ctx.regs.h) = 0x4D01;
+	ctx.ie_reg = 0;
+	ctx.int_flags = 0;
+	ctx.int_master_enabled = false;
+	ctx.enable_ime = false;
+
+	timer_get_context()->div = 0xABCC;
 }
 
 bool cpu_step()
 {
 	if (!ctx.is_halted) {
-		uint16_t pc = ctx.regs.pc;
-
 		cpu_fetch_instruction();
+		emu_cycle(1);
 		cpu_fetch_data();
 
-		printf("%04x:%02x (%02x %02x %02x)\n", pc, ctx.instr->type, ctx.opcode,
-			   bus_read(pc + 1), bus_read(pc + 2));
-
 		if (ctx.instr == NULL) {
+			printf("NULL Instruction\n");
 			exit(-1);
 		}
 		cpu_exec();
@@ -53,8 +61,7 @@ bool cpu_step()
 	}
 
 	if (ctx.int_master_enabled) {
-		// @todo: implement this
-		// cpu_handle_int(&ctx);
+		cpu_handle_int(&ctx);
 		ctx.enable_ime = false;
 	}
 
@@ -69,10 +76,6 @@ void cpu_fetch_instruction()
 {
 	ctx.opcode = bus_read(ctx.regs.pc++);
 	ctx.instr = inst_get_by_opcode(ctx.opcode);
-	if (ctx.instr == NULL) {
-		fprintf(stderr, "Unknown Instruction: %02x\n", ctx.opcode);
-		exit(-8);
-	}
 }
 
 void cpu_fetch_data()
@@ -240,6 +243,11 @@ void cpu_fetch_data()
 	}
 }
 
+void cpu_req_int(interrupt_type t)
+{
+	ctx.int_flags |= t;
+}
+
 uint8_t cpu_get_ie()
 {
 	return ctx.ie_reg;
@@ -256,6 +264,7 @@ void cpu_exec()
 
 	if (!proc) {
 		NOT_IMPLEMENTED();
+		exit(-1);
 	}
 
 	proc(&ctx);

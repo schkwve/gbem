@@ -17,44 +17,38 @@
  *
  */
 
+#include <bus.h>
+#include <dma.h>
 #include <ppu.h>
+#include <unistd.h>
 
-static ppu_ctx ctx = { 0 };
+static dma_ctx ctx;
 
-void ppu_init()
+void dma_start(uint8_t byte)
 {
+	ctx.is_active = true;
+	ctx.byte = 0;
+	ctx.delay = 2;
+	ctx.value = byte;
 }
 
-void ppu_tick()
+void dma_tick()
 {
-}
-
-uint8_t ppu_oam_read(uint16_t addr)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
+	if (!ctx.is_active) {
+		return;
 	}
 
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	return p[addr];
-}
-
-void ppu_oam_write(uint16_t addr, uint8_t val)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
+	if (ctx.delay) {
+		ctx.delay--;
+		return;
 	}
 
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	p[addr] = val;
+	ppu_oam_write(ctx.byte, bus_read((ctx.value * 0x100) + ctx.byte));
+	ctx.byte++;
+	ctx.is_active = ctx.byte < 0xA0;
 }
 
-uint8_t ppu_vram_read(uint16_t addr)
+bool dma_is_transferring()
 {
-	return ctx.vram[addr - 0x8000];
-}
-
-void ppu_vram_write(uint16_t addr, uint8_t val)
-{
-	ctx.vram[addr - 0x8000] = val;
+	return ctx.is_active;
 }

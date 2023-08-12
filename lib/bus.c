@@ -19,9 +19,12 @@
 
 #include <common.h>
 #include <bus.h>
+#include <dma.h>
 #include <ram.h>
 #include <cartridge.h>
 #include <cpu.h>
+#include <io.h>
+#include <ppu.h>
 
 uint8_t bus_read(uint16_t addr)
 {
@@ -30,7 +33,7 @@ uint8_t bus_read(uint16_t addr)
 		return cart_read(addr);
 	} else if (addr < 0xA000) {
 		// CHR/BG Maps
-		NOT_IMPLEMENTED();
+		return ppu_vram_read(addr);
 	} else if (addr < 0xC000) {
 		// Cartridge RAM
 		return cart_read(addr);
@@ -42,20 +45,22 @@ uint8_t bus_read(uint16_t addr)
 		return 0;
 	} else if (addr < 0xFEA0) {
 		// OAM
-		NOT_IMPLEMENTED();
+		if (dma_is_transferring()) {
+			return 0xFF;
+		}
+		return ppu_oam_read(addr);
 	} else if (addr < 0xFF00) {
 		// Reserved
 		return 0;
 	} else if (addr < 0xFF80) {
 		// I/O
-		NOT_IMPLEMENTED();
+		return io_read(addr);
 	} else if (addr == 0xFFFF) {
 		// CPU Interrupt Enable
 		return cpu_get_ie();
-	} else {
-		// High RAM / Zero Page
-		return hram_read(addr);
 	}
+
+	return hram_read(addr);
 }
 
 void bus_write(uint16_t addr, uint8_t val)
@@ -65,7 +70,7 @@ void bus_write(uint16_t addr, uint8_t val)
 		return;
 	} else if (addr < 0xA000) {
 		// CHR/BG Maps
-		NOT_IMPLEMENTED();
+		ppu_vram_write(addr, val);
 	} else if (addr < 0xC000) {
 		// Cartridge RAM
 		cart_write(addr, val);
@@ -76,12 +81,15 @@ void bus_write(uint16_t addr, uint8_t val)
 		// Reserved
 	} else if (addr < 0xFEA0) {
 		// OAM
-		NOT_IMPLEMENTED();
+		if (dma_is_transferring()) {
+			return;
+		}
+		ppu_oam_write(addr, val);
 	} else if (addr < 0xFF00) {
 		// Reserved
 	} else if (addr < 0xFF80) {
 		// I/O
-		NOT_IMPLEMENTED();
+		io_write(addr, val);
 	} else if (addr == 0xFFFF) {
 		// CPU Interrupt Enable
 		cpu_set_ie(val);
@@ -89,8 +97,6 @@ void bus_write(uint16_t addr, uint8_t val)
 		// High RAM / Zero Page
 		hram_write(addr, val);
 	}
-
-	NOT_IMPLEMENTED();
 }
 
 uint16_t bus_read16(uint16_t addr)

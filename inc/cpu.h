@@ -60,6 +60,11 @@ typedef struct {
 
 typedef void (*IN_PROC)(cpu_ctx *);
 
+// Implemented in emu.c
+void *cpu_run(void *p);
+
+/////
+
 IN_PROC inst_get_proc(in_type type);
 
 void cpu_init();
@@ -93,6 +98,8 @@ void goto_addr(cpu_ctx *ctx, uint16_t addr, bool pushpc);
 
 uint8_t cpu_get_int_flags();
 void cpu_set_int_flags(uint8_t val);
+
+bool is_16_bit(reg_type rt);
 
 //// INSTRUCTIONS
 

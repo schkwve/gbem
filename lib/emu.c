@@ -18,23 +18,27 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+//#ifdef linux
+#include <pthread.h>
+//#endif
+
+#include <common.h>
 #include <emu.h>
 #include <cartridge.h>
 #include <cpu.h>
+#include <timer.h>
+#include <dma.h>
+#include <ui.h>
 
 static emu_ctx ctx;
 
 emu_ctx *emu_get_context()
 {
 	return &ctx;
-}
-
-void delay(uint32_t ms)
-{
-	SDL_Delay(ms);
 }
 
 int emu_run(int argc, char **argv)
@@ -49,11 +53,31 @@ int emu_run(int argc, char **argv)
 		return -2;
 	}
 
-	SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
-
+	ui_init(1024, 768);
+	timer_init();
 	cpu_init();
 
+	//#ifdef linux
+	pthread_t cpu;
+
+	if (pthread_create(&cpu, NULL, cpu_run, NULL)) {
+		fprintf(stderr, "FATAL: Failed to create thread\n");
+		exit(-1);
+	}
+	//#endif
+
+	while (!ctx.should_die) {
+		usleep(1000);
+		ui_handle_events();
+
+		ui_update();
+	}
+
+	return 0;
+}
+
+void *cpu_run(void *p)
+{
 	ctx.running = true;
 	ctx.paused = false;
 	ctx.ticks = 0;
@@ -66,17 +90,22 @@ int emu_run(int argc, char **argv)
 
 		if (!cpu_step()) {
 			printf("CPU Stopped\n");
-			return -3;
+			return NULL;
 		}
 
 		ctx.ticks++;
 	}
 
-	return 0;
+	return NULL;
 }
 
 void emu_cycle(int num)
 {
-	(void)num;
-	NOT_IMPLEMENTED();
+	for (int i = 0; i < num; i++) {
+		for (int n = 0; n < 4; n++) {
+			ctx.ticks++;
+			timer_tick();
+		}
+		dma_tick();
+	}
 }

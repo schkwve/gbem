@@ -17,44 +17,19 @@
  *
  */
 
-#include <ppu.h>
+#ifndef __UI_H_
+#define __UI_H_
 
-static ppu_ctx ctx = { 0 };
+#include <SDL2/SDL.h>
+#include <common.h>
 
-void ppu_init()
-{
-}
+void ui_init(int width, int height);
+void ui_handle_events();
 
-void ppu_tick()
-{
-}
+void ui_update();
+void ui_update_debug();
 
-uint8_t ppu_oam_read(uint16_t addr)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
-	}
+void display_tile(SDL_Surface *surface, uint16_t start_loc, uint16_t tile_num,
+				  int x, int y);
 
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	return p[addr];
-}
-
-void ppu_oam_write(uint16_t addr, uint8_t val)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
-	}
-
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	p[addr] = val;
-}
-
-uint8_t ppu_vram_read(uint16_t addr)
-{
-	return ctx.vram[addr - 0x8000];
-}
-
-void ppu_vram_write(uint16_t addr, uint8_t val)
-{
-	ctx.vram[addr - 0x8000] = val;
-}
+#endif // __UI_H_

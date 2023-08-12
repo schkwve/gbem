@@ -27,10 +27,16 @@ void int_handle(cpu_ctx *ctx, uint16_t addr)
 	ctx->regs.pc = addr;
 }
 
-void cpu_req_int(interrupt_type t)
+bool int_check(cpu_ctx *ctx, uint16_t addr, interrupt_type it)
 {
-}
+	if (ctx->int_flags & it && ctx->ie_reg & it) {
+		int_handle(ctx, addr);
+		ctx->int_flags &= ~it;
+		ctx->is_halted = false;
+		ctx->int_master_enabled = false;
 
-void cpu_handle_int(cpu_ctx *ctx)
-{
+		return true;
+	}
+
+	return false;
 }

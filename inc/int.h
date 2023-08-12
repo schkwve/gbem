@@ -24,13 +24,16 @@
 
 typedef enum {
 	IT_VBLANK = 1,
-	IT_LCD_START = 2,
+	IT_LCD_STAT = 2,
 	IT_TIMER = 4,
 	IT_SERIAL = 8,
 	IT_JOYPAD = 16
 } interrupt_type;
 
-void cpu_req_int(interrupt_type t);
 void cpu_handle_int(cpu_ctx *ctx);
+void cpu_req_int(interrupt_type t);
+
+void int_handle(cpu_ctx *ctx, uint16_t addr);
+bool int_check(cpu_ctx *ctx, uint16_t addr, interrupt_type it);
 
 #endif // __INT_H_

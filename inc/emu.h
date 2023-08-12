@@ -29,6 +29,7 @@
 typedef struct {
 	bool running;
 	bool paused;
+	bool should_die;
 	uint64_t ticks;
 } emu_ctx;
 

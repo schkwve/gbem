@@ -17,44 +17,21 @@
  *
  */
 
-#include <ppu.h>
+#ifndef __DMA_H_
+#define __DMA_H_
 
-static ppu_ctx ctx = { 0 };
+#include <common.h>
 
-void ppu_init()
-{
-}
+typedef struct {
+	bool is_active;
+	uint8_t byte;
+	uint8_t value;
+	uint8_t delay;
+} dma_ctx;
 
-void ppu_tick()
-{
-}
+void dma_start(uint8_t byte);
+void dma_tick();
 
-uint8_t ppu_oam_read(uint16_t addr)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
-	}
+bool dma_is_transferring();
 
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	return p[addr];
-}
-
-void ppu_oam_write(uint16_t addr, uint8_t val)
-{
-	if (addr >= 0xFE00) {
-		addr -= 0xFE00;
-	}
-
-	uint8_t *p = (uint8_t *)ctx.oam_ram;
-	p[addr] = val;
-}
-
-uint8_t ppu_vram_read(uint16_t addr)
-{
-	return ctx.vram[addr - 0x8000];
-}
-
-void ppu_vram_write(uint16_t addr, uint8_t val)
-{
-	ctx.vram[addr - 0x8000] = val;
-}
+#endif // __DMA_H_
