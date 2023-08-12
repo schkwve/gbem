@@ -246,3 +246,13 @@ void goto_addr(cpu_ctx *ctx, uint16_t addr, bool pushpc)
 		emu_cycle(1);
 	}
 }
+
+uint8_t cpu_get_int_flags()
+{
+	return ctx.int_flags;
+}
+
+void cpu_set_int_flags(uint8_t val)
+{
+	ctx.int_flags = val;
+}

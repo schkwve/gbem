@@ -5,5 +5,6 @@ include_HEADERS = emu.h \
 				ram.h \
 				stack.h \
 				ppu.h \
+				int.h \
 				timer.h \
 				common.h

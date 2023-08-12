@@ -26,6 +26,10 @@
 static IN_PROC instr_func[] = {
 	[IN_NONE] = proc_none,
 	[IN_NOP] = proc_nop,
+	[IN_RLCA] = proc_rlca,
+	[IN_RRCA] = proc_rrca,
+	[IN_RLA] = proc_rla,
+	[IN_RRA] = proc_rra,
 	[IN_AND] = proc_and,
 	[IN_XOR] = proc_xor,
 	[IN_OR] = proc_or,
@@ -46,8 +50,15 @@ static IN_PROC instr_func[] = {
 	[IN_RETI] = proc_reti,
 	[IN_RST] = proc_rst,
 	[IN_DI] = proc_di,
+	[IN_EI] = proc_ei,
 	[IN_PUSH] = proc_push,
-	[IN_POP] = proc_pop
+	[IN_POP] = proc_pop,
+	[IN_DAA] = proc_daa,
+	[IN_CPL] = proc_cpl,
+	[IN_SCF] = proc_scf,
+	[IN_CCF] = proc_ccf,
+	[IN_STOP] = proc_stop,
+	[IN_HALT] = proc_halt
 };
 // clang-format on
 
@@ -65,6 +76,45 @@ void proc_none(cpu_ctx *ctx)
 void proc_nop(cpu_ctx *ctx)
 {
 	(void)ctx;
+}
+
+void proc_rlca(cpu_ctx *ctx)
+{
+	uint8_t u = ctx->regs.a;
+	bool c = (u >> 7) & 1;
+	u = (u << 1) | c;
+	ctx->regs.a = u;
+
+	cpu_set_flags(ctx, 0, 0, 0, c);
+}
+
+void proc_rrca(cpu_ctx *ctx)
+{
+	uint8_t b = ctx->regs.a & 1;
+	ctx->regs.a >>= 1;
+	ctx->regs.a |= (b << 7);
+
+	cpu_set_flags(ctx, 0, 0, 0, b);
+}
+
+void proc_rla(cpu_ctx *ctx)
+{
+	uint8_t u = ctx->regs.a;
+	uint8_t cf = CPU_FLAG_C;
+	uint8_t c = (u >> 7) & 1;
+
+	ctx->regs.a = (u << 1) | cf;
+	cpu_set_flags(ctx, 0, 0, 0, c);
+}
+
+void proc_rra(cpu_ctx *ctx)
+{
+	uint8_t c = CPU_FLAG_C;
+	uint8_t new_c = ctx->regs.a & 1;
+
+	ctx->regs.a >>= 1;
+	ctx->regs.a |= (c << 7);
+	cpu_set_flags(ctx, 0, 0, 0, new_c);
 }
 
 void proc_and(cpu_ctx *ctx)
@@ -234,26 +284,25 @@ void proc_inc(cpu_ctx *ctx)
 
 void proc_dec(cpu_ctx *ctx)
 {
-	uint16_t val = cpu_read_reg(ctx->instr->reg1) + 1;
+	uint16_t val = cpu_read_reg(ctx->instr->reg1) - 1;
 
 	if (ctx->instr->reg1 >= RT_AF) {
 		emu_cycle(1);
 	}
 
 	if (ctx->instr->reg1 == RT_HL && ctx->instr->mode == AM_MR) {
-		val = bus_read(cpu_read_reg(RT_HL)) + 1;
-		val &= 0xFF;
+		val = bus_read(cpu_read_reg(RT_HL)) - 1;
 		bus_write(cpu_read_reg(RT_HL), val);
 	} else {
 		cpu_set_reg(ctx->instr->reg1, val);
 		val = cpu_read_reg(ctx->instr->reg1);
 	}
 
-	if ((ctx->opcode & 0x03) == 0x03) {
+	if ((ctx->opcode & 0x0B) == 0x0B) {
 		return;
 	}
 
-	cpu_set_flags(ctx, val == 0, 0, (val & 0x0F) == 0, -1);
+	cpu_set_flags(ctx, val == 0, 0, (val & 0x0F) == 0x0F, -1);
 }
 
 void proc_add(cpu_ctx *ctx)
@@ -359,9 +408,9 @@ void proc_ld(cpu_ctx *ctx)
 		uint8_t hflag =
 			(cpu_read_reg(ctx->instr->reg2) & 0xF) + (ctx->fetch_data & 0xF) >=
 			0x10;
-		uint8_t cflag =
-			(cpu_read_reg(ctx->instr->reg2) & 0xF) + (ctx->fetch_data & 0xFF) >=
-			0x100;
+		uint8_t cflag = (cpu_read_reg(ctx->instr->reg2) & 0xFF) +
+							(ctx->fetch_data & 0xFF) >=
+						0x100;
 
 		cpu_set_flags(ctx, 0, 0, hflag, cflag);
 		cpu_set_reg(ctx->instr->reg1,
@@ -436,6 +485,11 @@ void proc_di(cpu_ctx *ctx)
 	ctx->int_master_enabled = false;
 }
 
+void proc_ei(cpu_ctx *ctx)
+{
+	ctx->enable_ime = true;
+}
+
 void proc_push(cpu_ctx *ctx)
 {
 	uint16_t hi = (cpu_read_reg(ctx->instr->reg1) >> 8) & 0xFF;
@@ -463,4 +517,49 @@ void proc_pop(cpu_ctx *ctx)
 	if (ctx->instr->reg1 == RT_AF) {
 		cpu_set_reg(ctx->instr->reg1, n & 0xFFF0);
 	}
+}
+
+void proc_daa(cpu_ctx *ctx)
+{
+	uint8_t u = 0;
+	int fc = 0;
+
+	if (CPU_FLAG_H || (!CPU_FLAG_N && (ctx->regs.a & 0xF) > 0x09)) {
+		u = 6;
+	}
+
+	if (CPU_FLAG_C || (!CPU_FLAG_N && ctx->regs.a > 0x99)) {
+		u |= 0x60;
+		fc = 1;
+	}
+
+	ctx->regs.a += CPU_FLAG_N ? -u : u;
+	cpu_set_flags(ctx, ctx->regs.a == 0, -1, 0, fc);
+}
+
+void proc_cpl(cpu_ctx *ctx)
+{
+	ctx->regs.a = -ctx->regs.a;
+	cpu_set_flags(ctx, -1, 1, 1, -1);
+}
+
+void proc_scf(cpu_ctx *ctx)
+{
+	cpu_set_flags(ctx, -1, 0, 0, 1);
+}
+
+void proc_ccf(cpu_ctx *ctx)
+{
+	cpu_set_flags(ctx, -1, 0, 0, CPU_FLAG_C ^ 1);
+}
+
+void proc_stop(cpu_ctx *ctx)
+{
+	printf("Stopping!\n");
+	NOT_IMPLEMENTED();
+}
+
+void proc_halt(cpu_ctx *ctx)
+{
+	ctx->is_halted = true;
 }

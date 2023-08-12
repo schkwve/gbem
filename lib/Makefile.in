@@ -133,7 +133,8 @@ libgbem_la_DEPENDENCIES =
 am_libgbem_la_OBJECTS = libgbem_la-emu.lo libgbem_la-bus.lo \
 	libgbem_la-instr.lo libgbem_la-cartridge.lo libgbem_la-cpu.lo \
 	libgbem_la-ram.lo libgbem_la-stack.lo libgbem_la-cpu_proc.lo \
-	libgbem_la-cpu_util.lo libgbem_la-ppu.lo libgbem_la-timer.lo
+	libgbem_la-cpu_util.lo libgbem_la-ppu.lo libgbem_la-int.lo \
+	libgbem_la-timer.lo
 libgbem_la_OBJECTS = $(am_libgbem_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -161,7 +162,8 @@ am__depfiles_remade = ./$(DEPDIR)/libgbem_la-bus.Plo \
 	./$(DEPDIR)/libgbem_la-cpu_util.Plo \
 	./$(DEPDIR)/libgbem_la-emu.Plo \
 	./$(DEPDIR)/libgbem_la-instr.Plo \
-	./$(DEPDIR)/libgbem_la-ppu.Plo ./$(DEPDIR)/libgbem_la-ram.Plo \
+	./$(DEPDIR)/libgbem_la-int.Plo ./$(DEPDIR)/libgbem_la-ppu.Plo \
+	./$(DEPDIR)/libgbem_la-ram.Plo \
 	./$(DEPDIR)/libgbem_la-stack.Plo \
 	./$(DEPDIR)/libgbem_la-timer.Plo
 am__mv = mv -f
@@ -340,6 +342,7 @@ libgbem_la_SOURCES = emu.c \
 				cpu_proc.c \
 				cpu_util.c \
 				ppu.c \
+				int.c \
 				timer.c
 
 libgbem_la_CPPFLAGS = -I${abs_top_srcdir}/inc
@@ -430,6 +433,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-cpu_util.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-emu.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-instr.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-int.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-ppu.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-ram.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgbem_la-stack.Plo@am__quote@ # am--include-marker
@@ -534,6 +538,13 @@ libgbem_la-ppu.lo: ppu.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='ppu.c' object='libgbem_la-ppu.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-ppu.lo `test -f 'ppu.c' || echo '$(srcdir)/'`ppu.c
+
+libgbem_la-int.lo: int.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-int.lo -MD -MP -MF $(DEPDIR)/libgbem_la-int.Tpo -c -o libgbem_la-int.lo `test -f 'int.c' || echo '$(srcdir)/'`int.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgbem_la-int.Tpo $(DEPDIR)/libgbem_la-int.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='int.c' object='libgbem_la-int.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libgbem_la-int.lo `test -f 'int.c' || echo '$(srcdir)/'`int.c
 
 libgbem_la-timer.lo: timer.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libgbem_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT libgbem_la-timer.lo -MD -MP -MF $(DEPDIR)/libgbem_la-timer.Tpo -c -o libgbem_la-timer.lo `test -f 'timer.c' || echo '$(srcdir)/'`timer.c
@@ -682,6 +693,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libgbem_la-cpu_util.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-emu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-instr.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-int.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ppu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ram.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-stack.Plo
@@ -738,6 +750,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libgbem_la-cpu_util.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-emu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-instr.Plo
+	-rm -f ./$(DEPDIR)/libgbem_la-int.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ppu.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-ram.Plo
 	-rm -f ./$(DEPDIR)/libgbem_la-stack.Plo

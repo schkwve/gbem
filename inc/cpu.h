@@ -24,6 +24,8 @@
 #include <instr.h>
 
 #define CPU_FLAG_Z BIT(ctx->regs.f, 7)
+#define CPU_FLAG_N BIT(ctx->regs.f, 6)
+#define CPU_FLAG_H BIT(ctx->regs.f, 5)
 #define CPU_FLAG_C BIT(ctx->regs.f, 4)
 
 typedef struct {
@@ -51,7 +53,9 @@ typedef struct {
 	bool step_mode;
 
 	bool int_master_enabled;
+	bool enable_ime;
 	uint8_t ie_reg;
+	uint8_t int_flags;
 } cpu_ctx;
 
 typedef void (*IN_PROC)(cpu_ctx *);
@@ -87,10 +91,17 @@ void cpu_set_flags(cpu_ctx *ctx, char z, char n, char h, char c);
 
 void goto_addr(cpu_ctx *ctx, uint16_t addr, bool pushpc);
 
+uint8_t cpu_get_int_flags();
+void cpu_set_int_flags(uint8_t val);
+
 //// INSTRUCTIONS
 
 void proc_none(cpu_ctx *ctx);
 void proc_nop(cpu_ctx *ctx);
+void proc_rlca(cpu_ctx *ctx);
+void proc_rrca(cpu_ctx *ctx);
+void proc_rla(cpu_ctx *ctx);
+void proc_rra(cpu_ctx *ctx);
 void proc_and(cpu_ctx *ctx);
 void proc_xor(cpu_ctx *ctx);
 void proc_or(cpu_ctx *ctx);
@@ -111,7 +122,14 @@ void proc_ret(cpu_ctx *ctx);
 void proc_reti(cpu_ctx *ctx);
 void proc_rst(cpu_ctx *ctx);
 void proc_di(cpu_ctx *ctx);
+void proc_ei(cpu_ctx *ctx);
 void proc_push(cpu_ctx *ctx);
 void proc_pop(cpu_ctx *ctx);
+void proc_daa(cpu_ctx *ctx);
+void proc_cpl(cpu_ctx *ctx);
+void proc_scf(cpu_ctx *ctx);
+void proc_ccf(cpu_ctx *ctx);
+void proc_stop(cpu_ctx *ctx);
+void proc_halt(cpu_ctx *ctx);
 
 #endif // __CPU_H_

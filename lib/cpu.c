@@ -20,6 +20,7 @@
 #include <cpu.h>
 #include <emu.h>
 #include <bus.h>
+#include <int.h>
 
 cpu_ctx ctx = { 0 };
 
@@ -44,6 +45,21 @@ bool cpu_step()
 			exit(-1);
 		}
 		cpu_exec();
+	} else {
+		emu_cycle(1);
+		if (ctx.int_flags) {
+			ctx.is_halted = false;
+		}
+	}
+
+	if (ctx.int_master_enabled) {
+		// @todo: implement this
+		// cpu_handle_int(&ctx);
+		ctx.enable_ime = false;
+	}
+
+	if (ctx.enable_ime) {
+		ctx.int_master_enabled = true;
 	}
 
 	return true;

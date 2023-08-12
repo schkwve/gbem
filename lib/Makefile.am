@@ -10,6 +10,7 @@ libgbem_la_SOURCES = emu.c \
 				cpu_proc.c \
 				cpu_util.c \
 				ppu.c \
+				int.c \
 				timer.c
 
 libgbem_la_CPPFLAGS = -I${abs_top_srcdir}/inc
