@@ -1,0 +1,73 @@
+#!/bin/bash
+
+while true; do
+	read -p "Do you wish to remove all maintainer files [y/n]? " yn
+	case $yn in
+		[Yy]* ) break;;
+		[Nn]* ) exit;;
+		* ) echo "Please answer y or n.";;
+	esac
+done
+
+rm -rf autom4te.cache/
+rm -rf aux-dist/
+rm -rf m4/
+rm -rf lib/.deps
+rm -rf lib/.libs
+rm -f lib/*.lo
+rm -f lib/*.la
+rm -rf src/.deps
+rm -f src/.dirstamp
+rm -rf build
+rm -rf build-aux/*
+
+if [ -f inc/Makefile ]; then
+	rm inc/Makefile
+fi
+if [ -f inc/Makefile.in ]; then
+	rm inc/Makefile.in
+fi
+if [ -f src/Makefile ]; then
+	rm src/Makefile
+fi
+if [ -f src/Makefile.in ]; then
+	rm src/Makefile.in
+fi
+if [ -f lib/Makefile ]; then
+	rm lib/Makefile
+fi
+if [ -f lib/Makefile.in ]; then
+	rm lib/Makefile.in
+fi
+if [ -f inc/Makefile ]; then
+	rm inc/Makefile
+fi
+if [ -f inc/Makefile.in ]; then
+	rm inc/Makefile.in
+fi
+if [ -f aclocal.m4 ]; then
+	rm aclocal.m4
+fi
+if [ -f config.status ]; then
+	rm config.status
+fi
+if [ -f config.log ]; then
+	rm config.log
+fi
+if [ -f configure ]; then
+	rm configure
+fi
+if [ -f configure~ ]; then
+	rm configure~
+fi
+if [ -f libtool ]; then
+	rm libtool
+fi
+if [ -f Makefile ]; then
+	rm Makefile
+fi
+if [ -f Makefile.in ]; then
+	rm Makefile.in
+fi
+
+echo "Done"
