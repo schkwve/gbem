@@ -10,8 +10,11 @@ libgbem_la_SOURCES = emu.c \
 				ram.c \
 				io.c \
 				stack.c \
+				lcd.c \
 				dma.c \
 				ppu.c \
+				ppu_smach.c \
+				ppu_pipeline.c \
 				int.c \
 				timer.c \
 				ui.c

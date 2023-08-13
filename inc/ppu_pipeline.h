@@ -17,38 +17,18 @@
  *
  */
 
+#ifndef __PPU_PIPELINE_H_
+#define __PPU_PIPELINE_H_
+
 #include <common.h>
-#include <ram.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-static ram_ctx ctx;
+void pipeline_process();
+void pipeline_fetch();
+void pipeline_push_pixel();
 
-uint8_t wram_read(uint16_t addr)
-{
-	addr -= 0xC000;
+void pipeline_fifo_reset();
+bool pipeline_fifo_add();
+void pixel_fifo_push(uint32_t val);
+uint32_t pixel_fifo_pop();
 
-	if (addr >= 0x2000) {
-		printf("Invalid WRAM read 0x%08x\n", addr + 0xC000);
-		exit(-1);
-	}
-	return ctx.wram[addr];
-}
-
-void wram_write(uint16_t addr, uint8_t val)
-{
-	addr -= 0xC000;
-	ctx.wram[addr] = val;
-}
-
-uint8_t hram_read(uint16_t addr)
-{
-	addr -= 0xFF80;
-	return ctx.hram[addr];
-}
-
-void hram_write(uint16_t addr, uint8_t val)
-{
-	addr -= 0xFF80;
-	ctx.hram[addr] = val;
-}
+#endif // __PPU_PIPELINE_H_

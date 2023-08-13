@@ -22,28 +22,22 @@
 #include <timer.h>
 #include <common.h>
 #include <dma.h>
+#include <lcd.h>
 
 static char serial_data[2];
-
-uint8_t ly = 0;
 
 uint8_t io_read(uint16_t addr)
 {
 	if (addr == 0xFF01) {
 		return serial_data[0];
-	}
-	if (addr == 0xFF02) {
+	} else if (addr == 0xFF02) {
 		return serial_data[1];
-	}
-	if (BETWEEN(addr, 0xFF04, 0xFF07)) {
+	} else if (BETWEEN(addr, 0xFF04, 0xFF07)) {
 		return timer_read(addr);
-	}
-	if (addr == 0xFF0F) {
+	} else if (addr == 0xFF0F) {
 		return cpu_get_int_flags();
-	}
-
-	if (addr == 0xFF44) {
-		return ly++;
+	} else if (BETWEEN(addr, 0xFF40, 0xFF4B)) {
+		return lcd_read(addr);
 	}
 
 	printf("Unsupported io_read: %04x\n", addr);
@@ -64,8 +58,9 @@ void io_write(uint16_t addr, uint8_t val)
 	} else if (addr == 0xFF0F) {
 		cpu_set_int_flags(val);
 		return;
-	} else if (addr == 0xFF46) {
-		dma_start(val);
+	} else if (BETWEEN(addr, 0xFF40, 0xFF4B)) {
+		lcd_write(addr, val);
+		return;
 	}
 
 	printf("Unsupported io_write: %04x\n", addr);

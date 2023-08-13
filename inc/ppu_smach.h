@@ -17,38 +17,14 @@
  *
  */
 
+#ifndef __PPU_SMACH_H_
+#define __PPU_SMACH_H_
+
 #include <common.h>
-#include <ram.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-static ram_ctx ctx;
+void ppu_mode_oam();
+void ppu_mode_xfer();
+void ppu_mode_vblank();
+void ppu_mode_hblank();
 
-uint8_t wram_read(uint16_t addr)
-{
-	addr -= 0xC000;
-
-	if (addr >= 0x2000) {
-		printf("Invalid WRAM read 0x%08x\n", addr + 0xC000);
-		exit(-1);
-	}
-	return ctx.wram[addr];
-}
-
-void wram_write(uint16_t addr, uint8_t val)
-{
-	addr -= 0xC000;
-	ctx.wram[addr] = val;
-}
-
-uint8_t hram_read(uint16_t addr)
-{
-	addr -= 0xFF80;
-	return ctx.hram[addr];
-}
-
-void hram_write(uint16_t addr, uint8_t val)
-{
-	addr -= 0xFF80;
-	ctx.hram[addr] = val;
-}
+#endif // __PPU_SMACH_H_

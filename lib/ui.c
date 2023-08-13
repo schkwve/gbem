@@ -20,6 +20,7 @@
 #include <common.h>
 #include <bus.h>
 #include <ui.h>
+#include <ppu.h>
 #include <emu.h>
 
 #include <SDL2/SDL.h>
@@ -46,6 +47,12 @@ void ui_init(int width, int height)
 	TTF_Init();
 
 	SDL_CreateWindowAndRenderer(width, height, 0, &sdlWindow, &sdlRenderer);
+
+	screen = SDL_CreateRGBSurface(0, width, height, 32, 0x00FF0000, 0x0000FF00,
+								  0x000000FF, 0xFF000000);
+	sdlTexture = SDL_CreateTexture(sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
+								   SDL_TEXTUREACCESS_STREAMING, width, height);
+
 	SDL_CreateWindowAndRenderer(16 * 8 * scale, 32 * 8 * scale, 0,
 								&sdlDebugWindow, &sdlDebugRenderer);
 
@@ -71,6 +78,30 @@ void ui_handle_events()
 
 void ui_update()
 {
+	SDL_Rect rc;
+	rc.x = 0;
+	rc.y = 0;
+	rc.w = 2048;
+	rc.h = 2048;
+
+	uint32_t *framebuffer = ppu_get_context()->framebuffer;
+
+	for (int y = 0; y < YRES; y++) {
+		for (int x = 0; x < XRES; x++) {
+			rc.x = x * scale;
+			rc.y = y * scale;
+			rc.w = scale;
+			rc.h = scale;
+
+			SDL_FillRect(screen, &rc, framebuffer[x + (y * XRES)]);
+		}
+	}
+
+	SDL_UpdateTexture(sdlTexture, NULL, screen->pixels, screen->pitch);
+	SDL_RenderClear(sdlRenderer);
+	SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
+	SDL_RenderPresent(sdlRenderer);
+
 	ui_update_debug();
 }
 
@@ -131,6 +162,11 @@ void display_tile(SDL_Surface *surface, uint16_t start_loc, uint16_t tile_num,
 			SDL_FillRect(surface, &rc, tile_colors[color]);
 		}
 	}
+}
+
+uint32_t get_ticks()
+{
+	return SDL_GetTicks();
 }
 
 void delay(uint32_t ms)
